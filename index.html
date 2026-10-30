@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digits Learning</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Digits">
+</head>
+<body>
+    <header id="app-header">
+        <h1 id="header-title">DIGITS LEARNING</h1>
+    </header>
+
+    <main id="app">
+        <!-- Menu Screen -->
+        <section id="screen-menu" class="screen">
+            <div class="constants-grid">
+                <!-- Cards will be injected here -->
+            </div>
+        </section>
+
+        <!-- Game Screen -->
+        <section id="screen-game" class="screen hidden">
+            <div class="game-display">
+                <div id="digit-sequence" class="digit-sequence"></div>
+                <div class="stats">
+                    <span>Score: <span id="score">0</span> digits</span>
+                    <span>Time: <span id="timer">0:00</span></span>
+                </div>
+            </div>
+            <div class="keypad">
+                <button class="key" data-val="1">1</button>
+                <button class="key" data-val="2">2</button>
+                <button class="key" data-val="3">3</button>
+                <button class="key" data-val="4">4</button>
+                <button class="key" data-val="5">5</button>
+                <button class="key" data-val="6">6</button>
+                <button class="key" data-val="7">7</button>
+                <button class="key" data-val="8">8</button>
+                <button class="key" data-val="9">9</button>
+                <button class="key" data-val="0">0</button>
+            </div>
+        </section>
+
+        <!-- Game Over Screen -->
+        <section id="screen-gameover" class="screen hidden">
+            <h2 class="game-over-text">Game Over !</h2>
+            <div class="final-stats">
+                <p>Score: <span id="final-score">0</span> digits</p>
+                <p>Time: <span id="final-time">0:00</span></p>
+            </div>
+            <div class="menu-buttons">
+                <button id="btn-retry" class="menu-btn">Try Again</button>
+                <button id="btn-menu" class="menu-btn">Menu</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
+</body>
+</html>
