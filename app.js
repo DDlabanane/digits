@@ -12,13 +12,13 @@ const CONSTANTS = {
     sqrt2: {
         name: 'Square Root 2',
         symbol: '√2',
-        digits: '1.414213562373095048801688724209698078569671875376948073176679737990732478462107038850387534327641572'
+        digits: '1.4142135623730950488016888724209698078569671875376948073176679737990732478462107038850387534327641572'
     }
 };
 
 async function initApp() {
     let activeConstant = null;
-    let currentStep = 0; // Index of the digit we are expecting
+    let currentStep = 0;
     let score = 0;
     let startTime = null;
     let timerInterval = null;
@@ -35,7 +35,6 @@ async function initApp() {
     const finalScoreEl = document.getElementById('final-score');
     const finalTimeEl = document.getElementById('final-time');
 
-    // 1. Initialize Menu
     const constantsGrid = document.querySelector('.constants-grid');
     Object.entries(CONSTANTS).forEach(([key, data]) => {
         const card = document.createElement('div');
@@ -51,21 +50,16 @@ async function initApp() {
 
     function startGame(constantKey) {
         activeConstant = CONSTANTS[constantKey];
-        currentStep = 2; // Skip the "3." or "2." part (start at index 2)
+        currentStep = 2;
         score = 0;
-
         scoreEl.textContent = '0';
         timerEl.textContent = '0:00';
         digitSequenceEl.innerHTML = '';
-
-        // Show the first digit to start the user off
         digitSequenceEl.innerHTML = `<span class="correct">${activeConstant.digits[0]}</span><span class="correct">${activeConstant.digits[1]}</span>`;
-
         screenMenu.classList.add('hidden');
         screenGameOver.classList.add('hidden');
         screenGame.classList.remove('hidden');
         headerTitle.textContent = activeConstant.name.toUpperCase();
-
         startTimer();
     }
 
@@ -82,36 +76,26 @@ async function initApp() {
 
     function handleInput(digit) {
         const targetDigit = activeConstant.digits[currentStep];
-
         if (digit === targetDigit) {
-            // Correct!
             score++;
             scoreEl.textContent = score;
-
             const span = document.createElement('span');
             span.className = 'correct';
             span.textContent = digit;
             digitSequenceEl.appendChild(span);
-
             currentStep++;
-
-            // End game if we run out of digits
             if (currentStep >= activeConstant.digits.length) {
                 endGame();
             }
         } else {
-            // Wrong!
             const span = document.createElement('span');
             span.className = 'wrong';
             span.textContent = digit;
             digitSequenceEl.appendChild(span);
-
-            // Show the correct digit next to it
             const correctSpan = document.createElement('span');
             correctSpan.className = 'correct';
             correctSpan.textContent = targetDigit;
             digitSequenceEl.appendChild(correctSpan);
-
             endGame();
         }
     }
@@ -119,24 +103,25 @@ async function initApp() {
     function endGame() {
         clearInterval(timerInterval);
 
+        const remainingDigits = activeConstant.digits.substring(currentStep + 1, currentStep + 10);
+        const greyDigits = document.createElement('span');
+        greyDigits.style.color = '#ccc';
+        greyDigits.textContent = remainingDigits;
+        digitSequenceEl.appendChild(greyDigits);
+
         const finalTime = timerEl.textContent;
         finalScoreEl.textContent = score;
         finalTimeEl.textContent = finalTime;
 
-        screenGame.classList.add('hidden');
         screenGameOver.classList.remove('hidden');
         headerTitle.textContent = 'GAME OVER';
     }
 
-    // Event Listeners
     document.querySelectorAll('.key').forEach(btn => {
         btn.onclick = () => handleInput(btn.dataset.val);
     });
 
     document.getElementById('btn-retry').onclick = () => {
-        // We need to know which constant was active.
-        // For simplicity, let's just go back to menu or restart the last one.
-        // Finding the last active constant:
         const constantsKeys = Object.keys(CONSTANTS);
         const lastKey = constantsKeys.find(k => CONSTANTS[k] === activeConstant);
         startGame(lastKey);
