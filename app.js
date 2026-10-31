@@ -22,7 +22,7 @@ const CONSTANTS = {
     tau: {
         name: 'Tau',
         symbol: 'τ',
-        digits: '6.283185307179586476925286766559005768394338798750211641949889184615632812572417997256066898134813445'
+        digits: '6.283185307179586476925286766559005768394338798750211641949889184615632812도572417997256066898134813445'
     }
 };
 
@@ -34,6 +34,7 @@ async function initApp() {
     let timerInterval = null;
 
     const screenMenu = document.getElementById('screen-menu');
+    const screenStudy = document.getElementById('screen-study');
     const screenGame = document.getElementById('screen-game');
     const screenGameOver = document.getElementById('screen-gameover');
     const headerTitle = document.getElementById('header-title');
@@ -56,21 +57,44 @@ async function initApp() {
             <span class="const-name">${data.name}</span>
             <span class="const-preview">${data.digits.substring(0, 12)}...</span>
         `;
-        card.onclick = () => startGame(key);
+
+        // Instead of starting game directly, we show a choice: Study or Play
+        card.onclick = () => showConstantOptions(key);
         constantsGrid.appendChild(card);
     });
 
-    function startGame(constantKey) {
-        activeConstant = CONSTANTS[constantKey];
-        currentStep = 2; // Start after the "X."
+    function showConstantOptions(constantKey) {
+        const data = CONSTANTS[constantKey];
+        activeConstant = data;
+
+        // We'll reuse the Study screen as the "landing page" for a constant
+        // but let's just go straight to study since it's what the user asked for
+        startStudy();
+    }
+
+    function startStudy() {
+        const studyDigitsEl = document.getElementById('study-digits');
+        studyDigitsEl.textContent = activeConstant.digits;
+
+        screenMenu.classList.add('hidden');
+        screenStudy.classList.remove('hidden');
+        screenGame.classList.add('hidden');
+        screenGameOver.classList.add('hidden');
+        headerTitle.textContent = `${activeConstant.name} STUDY`;
+    }
+
+    function startGame() {
+        currentStep = 2;
         score = 0;
         scoreEl.textContent = '0';
         timerEl.textContent = '0:00';
 
-        // Initial display: show the whole number and decimal point
         digitSequenceEl.innerHTML = `<span class="correct">${activeConstant.digits[0]}</span><span class="correct">${activeConstant.digits[1]}</span>`;
+        digitSequenceEl.style.justifyContent = 'center';
+        digitSequenceEl.style.paddingLeft = '0';
 
         screenMenu.classList.add('hidden');
+        screenStudy.classList.add('hidden');
         screenGameOver.classList.add('hidden');
         screenGame.classList.remove('hidden');
         headerTitle.textContent = activeConstant.name.toUpperCase();
@@ -100,11 +124,9 @@ async function initApp() {
             span.textContent = digit;
             digitSequenceEl.appendChild(span);
 
-            // Auto-scroll sequence to the left as it grows
-            // We want the latest digit to be roughly in the center
             if (currentStep > 5) {
                 digitSequenceEl.style.justifyContent = 'flex-end';
-                digitSequenceEl.style.paddingLeft = `${(currentStep - 5) * 22}px`; // Rough estimate of digit width
+                digitSequenceEl.style.paddingLeft = `${(currentStep - 5) * 22}px`;
             }
 
             currentStep++;
@@ -112,13 +134,11 @@ async function initApp() {
                 endGame(true);
             }
         } else {
-            // Flash Wrong Digit
             const span = document.createElement('span');
             span.className = 'wrong';
             span.textContent = digit;
             digitSequenceEl.appendChild(span);
 
-            // Visual feedback for mistake
             digitSequenceEl.classList.add('wrong');
             setTimeout(() => digitSequenceEl.classList.remove('wrong'), 300);
 
@@ -133,7 +153,6 @@ async function initApp() {
         finalScoreEl.textContent = score;
         finalTimeEl.textContent = finalTime;
 
-        // Show a preview of the next few digits you missed
         const nextDigits = activeConstant.digits.substring(currentStep, currentStep + 10);
         document.getElementById('gameover-digits').innerHTML =
             `<span class="correct">${activeConstant.digits.substring(0, currentStep)}</span><span class="wrong">${nextDigits[0] || ''}</span>`;
@@ -147,14 +166,21 @@ async function initApp() {
     });
 
     document.getElementById('btn-retry').onclick = () => {
-        const constantsKeys = Object.keys(CONSTANTS);
-        const lastKey = constantsKeys.find(k => CONSTANTS[k] === activeConstant);
-        startGame(lastKey);
+        startGame();
     };
 
     document.getElementById('btn-menu').onclick = () => {
         screenGameOver.classList.add('hidden');
         screenGame.classList.add('hidden');
+        screenStudy.classList.add('hidden');
+        screenMenu.classList.remove('hidden');
+        headerTitle.textContent = 'DIGITS';
+    };
+
+    // Study screen controls
+    document.getElementById('btn-study-play').onclick = () => startGame();
+    document.getElementById('btn-study-back').onclick = () => {
+        screenStudy.classList.add('hidden');
         screenMenu.classList.remove('hidden');
         headerTitle.textContent = 'DIGITS';
     };
