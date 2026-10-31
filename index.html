@@ -12,7 +12,7 @@
 </head>
 <body>
     <header id="app-header">
-        <h1 id="header-title">DIGITS LEARNING</h1>
+        <h1 id="header-title">DIGITS</h1>
     </header>
 
     <main id="app">
@@ -28,8 +28,8 @@
             <div class="game-display">
                 <div id="digit-sequence" class="digit-sequence"></div>
                 <div class="stats">
-                    <span>Score: <span id="score">0</span> digits</span>
-                    <span>Time: <span id="timer">0:00</span></span>
+                    <span>SCORE: <span id="score" class="stat-val">0</span></span>
+                    <span>TIME: <span id="timer" class="stat-val">0:00</span></span>
                 </div>
             </div>
             <div class="keypad">
@@ -48,15 +48,15 @@
 
         <!-- Game Over Screen -->
         <section id="screen-gameover" class="screen hidden">
+            <h2 class="game-over-text">CRASHED!</h2>
             <div id="gameover-digits" class="digit-sequence"></div>
-            <h2 class="game-over-text">Game Over !</h2>
             <div class="final-stats">
-                <p>Score: <span id="final-score">0</span> digits</p>
-                <p>Time: <span id="final-time">0:00</span></p>
+                <p>FINAL SCORE: <span id="final-score">0</span></p>
+                <p>TIME: <span id="final-time">0:00</span></p>
             </div>
             <div class="menu-buttons">
-                <button id="btn-retry" class="menu-btn">Try Again</button>
-                <button id="btn-menu" class="menu-btn">Menu</button>
+                <button id="btn-retry" class="menu-btn">RETRY</button>
+                <button id="btn-menu" class="menu-btn">MENU</button>
             </div>
         </section>
     </main>

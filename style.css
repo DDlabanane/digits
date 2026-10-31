@@ -1,23 +1,24 @@
 :root {
-    --bg-color: #fdfdfd;
-    --header-bg: #e0e0e0;
-    --text-main: #333;
-    --text-muted: #666;
-    --accent-color: #4a90e2;
-    --card-bg: #f0f0f0;
-    --key-bg: #e8e8e8;
-    --key-active: #d0d0d0;
-    --danger: #ff4d4d;
+    --bg-dark: #0a0a0a;
+    --bg-panel: #1a1a1a;
+    --accent-color: #00ffcc; /* Neon Cyan */
+    --text-main: #ffffff;
+    --text-muted: #888888;
+    --danger: #ff3366;
+    --key-bg: #2a2a2a;
+    --key-active: #3a3a3a;
+    --font-mono: 'Courier New', Courier, monospace;
 }
 
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg-color);
+    background-color: var(--bg-dark);
     color: var(--text-main);
     margin: 0;
     padding: 0;
@@ -28,188 +29,226 @@ body {
 }
 
 header {
-    background-color: var(--header-bg);
+    background-color: var(--bg-dark);
     padding: 20px 15px;
     text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border-bottom: 1px solid #222;
 }
 
 h1 {
     margin: 0;
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 4px;
+    font-weight: 800;
+    color: var(--accent-color);
+    text-transform: uppercase;
 }
 
 #app {
     flex: 1;
     position: relative;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
+.hidden {
+    display: none !important;
+}
+
+/* Menu Screen */
+#screen-menu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.constants-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+}
+
+.const-card {
+    background: var(--bg-panel);
+    border: 2px solid #333;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.const-card:active {
+    transform: scale(0.95);
+    border-color: var(--accent-color);
+    background: var(--key-active);
+}
+
+.const-symbol {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.const-name {
+    font-size: 1rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.const-preview {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Game Screen */
+#screen-game {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 30px;
+}
+
+.game-display {
+    text-align: center;
+    margin-top: 40px;
+    width: 100%;
+}
+
+.digit-sequence {
+    font-family: var(--font-mono);
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.correct { color: var(--text-main); }
+.wrong { color: var(--danger); animation: shake 0.2s ease-in-out; }
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.stat-val {
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Keypad - The "Game Console" feel */
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    width: 90%;
+    max-width: 360px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+.key {
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    border: none;
+    background: var(--key-bg);
+    color: var(--text-main);
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.05s;
+    box-shadow: 0 4px 0 #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.key:active {
+    background: var(--key-active);
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #000;
+}
+
+.key:nth-child(10) {
+    grid-column: 2;
+}
+
+/* Game Over Screen */
 #screen-gameover {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--bg-color);
-    z-index: 10;
+    background: rgba(10, 10, 10, 0.95);
+    z-index: 100;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px;
-}
-
-.hidden {
-    display: none !important;
-    opacity: 0;
-}
-
-/* Menu */
-.constants-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin: 40px auto 0 auto;
-    width: 100%;
-    max-width: 400px;
-    justify-items: center;
-}
-
-.const-card {
-    background: var(--card-bg);
-    border-radius: 24px;
-    padding: 25px;
     text-align: center;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-.const-card:active {
-    transform: scale(0.95);
-    background: var(--key-active);
-}
-
-.const-symbol {
-    font-size: 3rem;
-    margin-bottom: 10px;
-    display: block;
-}
-
-.const-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    display: block;
-    margin-bottom: 5px;
-}
-
-.const-preview {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-/* Game */
-.game-display {
-    text-align: center;
-    margin-top: 50px;
-    width: 100%;
-}
-
-.digit-sequence {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    min-height: 3.5rem;
-    letter-spacing: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.correct { color: var(--text-main); }
-.wrong { color: var(--danger); }
-
-.stats {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    font-size: 1rem;
-    color: var(--text-muted);
-    margin-bottom: 40px;
-}
-
-.keypad {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
-    padding: 0;
-}
-
-.key {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    border: none;
-    background: var(--key-bg);
-    color: var(--text-main);
-    font-size: 1.5rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.1s;
-    justify-self: center;
-}
-
-/* This forces the 0 button (the 10th child) to be centered */
-.key:nth-child(10) {
-    grid-column: 2;
-}
-
-.key:active {
-    background: var(--key-active);
-}
-
-/* Game Over */
 .game-over-text {
-    font-size: 2rem;
-    margin-top: 80px;
-    color: var(--text-main);
+    font-size: 2.5rem;
+    color: var(--danger);
+    font-weight: 900;
+    margin-bottom: 20px;
 }
 
 .final-stats {
-    text-align: center;
-    margin: 30px 0;
-    font-size: 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    line-height: 1.6;
 }
 
 .menu-buttons {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-    max-width: 250px;
+    gap: 20px;
 }
 
 .menu-btn {
-    padding: 15px;
-    border-radius: 15px;
-    border: none;
-    background: var(--card-bg);
-    font-size: 1.1rem;
-    font-weight: 600;
+    padding: 15px 30px;
+    border-radius: 12px;
+    border: 2px solid var(--accent-color);
+    background: transparent;
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 .menu-btn:active {
-    background: var(--key-active);
+    background: var(--accent-color);
+    color: var(--bg-dark);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
 }
