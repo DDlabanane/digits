@@ -1,4 +1,4 @@
-const CACHE_NAME = 'digits-learning-v4';
+const CACHE_NAME = 'digits-learning-v5';
 const BASE_PATH = '/digits-learning/';
 
 const ASSETS = [

@@ -151,53 +151,73 @@ async function initApp() {
         score = 0;
         scoreEl.textContent = '0';
         timerEl.textContent = '0:00';
-
-        renderSequence();
+        sequenceWrapper = null; // force a fresh build of the sequence
 
         screenMenu.classList.add('hidden');
         screenStudy.classList.add('hidden');
         screenGameOver.classList.add('hidden');
         screenGame.classList.remove('hidden');
         headerTitle.textContent = activeConstant.name.toUpperCase();
+
+        // Render after the screen is visible so we can measure positions
+        renderSequence();
         startTimer();
     }
 
+    let sequenceWrapper = null;
+
+    function createDigitSpan(text, state) {
+        const span = document.createElement('span');
+        span.className = `digit-char ${state}`;
+        span.textContent = text;
+        return span;
+    }
+
+    // Slide the wrapper so the active digit sits in the middle of the screen.
+    // Uses layout positions (offsetLeft) so it stays correct mid-animation.
+    function centerSequence(animate) {
+        if (!sequenceWrapper || digitSequenceEl.clientWidth === 0) return;
+        const last = sequenceWrapper.lastElementChild;
+        if (!last) return;
+
+        const digitCenter = sequenceWrapper.offsetLeft + last.offsetLeft + last.offsetWidth / 2;
+        const offset = digitSequenceEl.clientWidth / 2 - digitCenter;
+
+        if (animate) {
+            sequenceWrapper.style.transform = `translateX(${offset}px)`;
+        } else {
+            // Jump instantly (no slide) for the very first position
+            sequenceWrapper.style.transition = 'none';
+            sequenceWrapper.style.transform = `translateX(${offset}px)`;
+            void sequenceWrapper.offsetWidth; // force reflow
+            sequenceWrapper.style.transition = '';
+        }
+    }
+
     function renderSequence() {
-        digitSequenceEl.innerHTML = '';
-
-        // Use a wrapper for the digits to make centering easier
-        const wrapper = document.createElement('div');
-        wrapper.style.display = 'flex';
-        wrapper.style.gap = '8px';
-
-        for (let i = 0; i < currentStep + 1 && i < activeConstant.digits.length; i++) {
-            const span = document.createElement('span');
-            span.className = 'digit-char';
-            if (i < currentStep) {
-                span.className += ' correct';
-                span.textContent = activeConstant.digits[i];
-            } else {
-                span.className += ' active';
-                span.textContent = '_';
+        if (!sequenceWrapper) {
+            // New game: build the sequence from scratch
+            digitSequenceEl.innerHTML = '';
+            sequenceWrapper = document.createElement('div');
+            sequenceWrapper.className = 'sequence-wrapper';
+            for (let i = 0; i < currentStep; i++) {
+                sequenceWrapper.appendChild(createDigitSpan(activeConstant.digits[i], 'correct'));
             }
-            wrapper.appendChild(span);
+            sequenceWrapper.appendChild(createDigitSpan('_', 'active'));
+            digitSequenceEl.appendChild(sequenceWrapper);
+            centerSequence(false);
+            return;
         }
 
-        digitSequenceEl.appendChild(wrapper);
-
-        // Use requestAnimationFrame to ensure the DOM has rendered before calculating positions
-        requestAnimationFrame(() => {
-            const lastDigit = wrapper.lastElementChild;
-            if (lastDigit) {
-                const rect = lastDigit.getBoundingClientRect();
-                const centerOfScreen = window.innerWidth / 2;
-                const currentCenterOfDigit = rect.left + rect.width / 2;
-                const offset = centerOfScreen - currentCenterOfDigit;
-
-                wrapper.style.transform = `translateX(${offset}px)`;
-            }
-        });
+        // Next digit: turn the cursor into a typed digit, add a new cursor, slide
+        const cursor = sequenceWrapper.lastElementChild;
+        cursor.className = 'digit-char correct';
+        cursor.textContent = activeConstant.digits[currentStep - 1];
+        sequenceWrapper.appendChild(createDigitSpan('_', 'active'));
+        centerSequence(true);
     }
+
+    window.addEventListener('resize', () => centerSequence(false));
 
     function startTimer() {
         startTime = Date.now();
@@ -259,7 +279,14 @@ async function initApp() {
         headerTitle.textContent = won ? 'PERFECT!' : (isRecord ? 'NEW RECORD!' : 'CRASHED!');
     }
 
+    function flashKey(btn) {
+        btn.classList.remove('flash');
+        void btn.offsetWidth; // restart the animation if tapped again quickly
+        btn.classList.add('flash');
+    }
+
     document.querySelectorAll('.key').forEach(btn => {
+        btn.addEventListener('pointerdown', () => flashKey(btn));
         btn.onclick = () => handleInput(btn.dataset.val);
     });
 
