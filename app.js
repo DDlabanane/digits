@@ -242,9 +242,18 @@ async function initApp() {
         if (isRecord) saveBest(activeKey, score);
         document.getElementById('final-best').textContent = Math.max(score, previousBest);
 
-        const nextDigits = activeConstant.digits.substring(currentStep, currentStep + 10);
-        document.getElementById('gameover-digits').innerHTML =
-            `<span class="correct">${activeConstant.digits.substring(0, currentStep)}</span><span class="wrong">${nextDigits[0] || ''}</span>`;
+        // Game over display: "..." + last 4 correct digits + the missed digit in red
+        const allDigits = activeConstant.digits;
+        const tailStart = Math.max(0, currentStep - 4);
+        const ellipsis = tailStart > 0
+            ? '<span class="digit-char correct" style="color: var(--text-muted)">...</span>'
+            : '';
+        const tail = allDigits.substring(tailStart, currentStep).split('')
+            .map(d => `<span class="digit-char correct">${d}</span>`).join('');
+        const missed = allDigits[currentStep]
+            ? `<span class="digit-char wrong">${allDigits[currentStep]}</span>`
+            : '';
+        document.getElementById('gameover-digits').innerHTML = ellipsis + tail + missed;
 
         screenGameOver.classList.remove('hidden');
         headerTitle.textContent = won ? 'PERFECT!' : (isRecord ? 'NEW RECORD!' : 'CRASHED!');
