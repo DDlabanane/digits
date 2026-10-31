@@ -22,7 +22,7 @@ const CONSTANTS = {
     tau: {
         name: 'Tau',
         symbol: 'τ',
-        digits: '6.283185307179586476925286766559005768394338798750211641949889184615632812도572417997256066898134813445'
+        digits: '6.283185307179586476925286766559005768394338798750211641949889184615632812572417997256066898134813445'
     }
 };
 
@@ -48,7 +48,6 @@ async function initApp() {
 
     const constantsGrid = document.querySelector('.constants-grid');
 
-    // Render Menu
     Object.entries(CONSTANTS).forEach(([key, data]) => {
         const card = document.createElement('div');
         card.className = 'const-card';
@@ -57,25 +56,15 @@ async function initApp() {
             <span class="const-name">${data.name}</span>
             <span class="const-preview">${data.digits.substring(0, 12)}...</span>
         `;
-
-        // Instead of starting game directly, we show a choice: Study or Play
-        card.onclick = () => showConstantOptions(key);
+        card.onclick = () => {
+            activeConstant = data;
+            startStudy();
+        };
         constantsGrid.appendChild(card);
     });
 
-    function showConstantOptions(constantKey) {
-        const data = CONSTANTS[constantKey];
-        activeConstant = data;
-
-        // We'll reuse the Study screen as the "landing page" for a constant
-        // but let's just go straight to study since it's what the user asked for
-        startStudy();
-    }
-
     function startStudy() {
-        const studyDigitsEl = document.getElementById('study-digits');
-        studyDigitsEl.textContent = activeConstant.digits;
-
+        document.getElementById('study-digits').textContent = activeConstant.digits;
         screenMenu.classList.add('hidden');
         screenStudy.classList.remove('hidden');
         screenGame.classList.add('hidden');
@@ -89,9 +78,7 @@ async function initApp() {
         scoreEl.textContent = '0';
         timerEl.textContent = '0:00';
 
-        digitSequenceEl.innerHTML = `<span class="correct">${activeConstant.digits[0]}</span><span class="correct">${activeConstant.digits[1]}</span>`;
-        digitSequenceEl.style.justifyContent = 'center';
-        digitSequenceEl.style.paddingLeft = '0';
+        renderSequence();
 
         screenMenu.classList.add('hidden');
         screenStudy.classList.add('hidden');
@@ -99,6 +86,43 @@ async function initApp() {
         screenGame.classList.remove('hidden');
         headerTitle.textContent = activeConstant.name.toUpperCase();
         startTimer();
+    }
+
+    function renderSequence() {
+        digitSequenceEl.innerHTML = '';
+
+        // Use a wrapper for the digits to make centering easier
+        const wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.gap = '8px';
+
+        for (let i = 0; i < currentStep + 1 && i < activeConstant.digits.length; i++) {
+            const span = document.createElement('span');
+            span.className = 'digit-char';
+            if (i < currentStep) {
+                span.className += ' correct';
+                span.textContent = activeConstant.digits[i];
+            } else {
+                span.className += ' active';
+                span.textContent = '_';
+            }
+            wrapper.appendChild(span);
+        }
+
+        digitSequenceEl.appendChild(wrapper);
+
+        // Use requestAnimationFrame to ensure the DOM has rendered before calculating positions
+        requestAnimationFrame(() => {
+            const lastDigit = wrapper.lastElementChild;
+            if (lastDigit) {
+                const rect = lastDigit.getBoundingClientRect();
+                const centerOfScreen = window.innerWidth / 2;
+                const currentCenterOfDigit = rect.left + rect.width / 2;
+                const offset = centerOfScreen - currentCenterOfDigit;
+
+                wrapper.style.transform = `translateX(${offset}px)`;
+            }
+        });
     }
 
     function startTimer() {
@@ -118,26 +142,13 @@ async function initApp() {
         if (digit === targetDigit) {
             score++;
             scoreEl.textContent = score;
-
-            const span = document.createElement('span');
-            span.className = 'correct';
-            span.textContent = digit;
-            digitSequenceEl.appendChild(span);
-
-            if (currentStep > 5) {
-                digitSequenceEl.style.justifyContent = 'flex-end';
-                digitSequenceEl.style.paddingLeft = `${(currentStep - 5) * 22}px`;
-            }
-
             currentStep++;
-            if (currentStep >= activeConstant.digits.length) {
-                endGame(true);
-            }
+            renderSequence();
         } else {
-            const span = document.createElement('span');
-            span.className = 'wrong';
-            span.textContent = digit;
-            digitSequenceEl.appendChild(span);
+            const targetSpan = document.createElement('span');
+            targetSpan.className = 'digit-char wrong';
+            targetSpan.textContent = digit;
+            digitSequenceEl.appendChild(targetSpan);
 
             digitSequenceEl.classList.add('wrong');
             setTimeout(() => digitSequenceEl.classList.remove('wrong'), 300);
@@ -148,7 +159,6 @@ async function initApp() {
 
     function endGame(won) {
         clearInterval(timerInterval);
-
         const finalTime = timerEl.textContent;
         finalScoreEl.textContent = score;
         finalTimeEl.textContent = finalTime;
@@ -165,10 +175,7 @@ async function initApp() {
         btn.onclick = () => handleInput(btn.dataset.val);
     });
 
-    document.getElementById('btn-retry').onclick = () => {
-        startGame();
-    };
-
+    document.getElementById('btn-retry').onclick = () => startGame();
     document.getElementById('btn-menu').onclick = () => {
         screenGameOver.classList.add('hidden');
         screenGame.classList.add('hidden');
@@ -177,7 +184,6 @@ async function initApp() {
         headerTitle.textContent = 'DIGITS';
     };
 
-    // Study screen controls
     document.getElementById('btn-study-play').onclick = () => startGame();
     document.getElementById('btn-study-back').onclick = () => {
         screenStudy.classList.add('hidden');

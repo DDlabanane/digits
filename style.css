@@ -128,19 +128,44 @@ h1 {
 
 .digit-sequence {
     font-family: var(--font-mono);
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: bold;
     margin-bottom: 20px;
-    height: 4rem;
+    height: 5rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    overflow: visible;
     white-space: nowrap;
+    gap: 8px;
+    position: relative;
 }
 
-.correct { color: var(--text-main); }
-.wrong { color: var(--danger); animation: shake 0.2s ease-in-out; }
+.digit-char {
+    display: inline-block;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    opacity: 0.3;
+    transform: scale(0.8);
+}
+
+.digit-char.active {
+    opacity: 1;
+    transform: scale(1.2);
+    color: var(--accent-color);
+}
+
+.digit-char.correct {
+    opacity: 1;
+    transform: scale(1);
+    color: var(--text-main);
+}
+
+.digit-char.wrong {
+    color: var(--danger);
+    animation: shake 0.2s ease-in-out;
+    opacity: 1;
+}
 
 .stats {
     display: flex;
