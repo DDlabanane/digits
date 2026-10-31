@@ -18,6 +18,10 @@
     <main id="app">
         <!-- Menu Screen -->
         <section id="screen-menu" class="screen">
+            <div class="menu-tabs">
+                <button id="tab-play" class="tab-btn active">PLAY</button>
+                <button id="tab-study" class="tab-btn">STUDY</button>
+            </div>
             <div class="constants-grid">
                 <!-- Cards will be injected here -->
             </div>
@@ -26,10 +30,9 @@
         <!-- Study Screen -->
         <section id="screen-study" class="screen hidden">
             <div class="study-container">
-                <div id="study-digits" class="study-digits"></div>
+                <div id="study-digits-container"></div>
             </div>
             <div class="study-controls">
-                <button id="btn-study-play" class="menu-btn">I'M READY TO PLAY</button>
                 <button id="btn-study-back" class="menu-btn">BACK TO MENU</button>
             </div>
         </section>

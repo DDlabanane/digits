@@ -65,6 +65,34 @@ h1 {
     overflow-y: auto;
 }
 
+.menu-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    background: var(--bg-panel);
+    padding: 5px;
+    border-radius: 12px;
+    border: 1px solid #333;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-family: var(--font-mono);
+    letter-spacing: 1px;
+}
+
+.tab-btn.active {
+    background: var(--accent-color);
+    color: var(--bg-dark);
+}
+
 .constants-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -195,7 +223,7 @@ h1 {
 
 .key {
     aspect-ratio: 1 / 1;
-    border-radius: 12px;
+    border-radius: 50%;
     border: none;
     background: var(--key-bg);
     color: var(--text-main);
@@ -207,12 +235,33 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .key:active {
     background: var(--key-active);
     transform: translateY(2px);
     box-shadow: 0 2px 0 #000;
+}
+
+.key::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    opacity: 0;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+    pointer-events: none;
+}
+
+.key:active::after {
+    transform: scale(2);
+    opacity: 1;
+    transition: none;
 }
 
 .key:nth-child(10) {
@@ -283,33 +332,41 @@ h1 {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    height: 100%;
+    overflow: hidden;
 }
 
 .study-container {
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 20px;
-    overflow-y: auto;
-    text-align: center;
+    display: block;
+    padding: 10px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
-.study-digits {
+.study-table {
+    border-collapse: collapse;
     font-family: var(--font-mono);
-    font-size: 2rem;
-    line-height: 1.6;
-    word-break: break-all;
+    font-size: 1.8rem;
     color: var(--text-main);
-    max-width: 600px;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    table-layout: fixed;
+}
+
+.study-table td {
+    padding: 10px;
+    width: 25%;
 }
 
 .study-controls {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    padding: 30px 20px;
+    padding: 0px 20px;
     background: var(--bg-panel);
     border-top: 2px solid #333;
 }

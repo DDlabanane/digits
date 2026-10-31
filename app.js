@@ -32,6 +32,7 @@ async function initApp() {
     let score = 0;
     let startTime = null;
     let timerInterval = null;
+    let currentMenuMode = 'play'; // 'play' or 'study'
 
     const screenMenu = document.getElementById('screen-menu');
     const screenStudy = document.getElementById('screen-study');
@@ -58,13 +59,49 @@ async function initApp() {
         `;
         card.onclick = () => {
             activeConstant = data;
-            startStudy();
+            if (currentMenuMode === 'study') {
+                startStudy();
+            } else {
+                startGame();
+            }
         };
         constantsGrid.appendChild(card);
     });
 
+    // Tab switching logic
+    const tabPlay = document.getElementById('tab-play');
+    const tabStudy = document.getElementById('tab-study');
+
+    tabPlay.onclick = () => {
+        currentMenuMode = 'play';
+        tabPlay.classList.add('active');
+        tabStudy.classList.remove('active');
+    };
+
+    tabStudy.onclick = () => {
+        currentMenuMode = 'study';
+        tabStudy.classList.add('active');
+        tabPlay.classList.remove('active');
+    };
+
     function startStudy() {
-        document.getElementById('study-digits').textContent = activeConstant.digits;
+        const container = document.getElementById('study-digits-container');
+        container.innerHTML = '';
+
+        const digits = activeConstant.digits.substring(0, 200);
+        const table = document.createElement('table');
+        table.className = 'study-table';
+
+        let row;
+        for (let i = 0; i < digits.length; i++) {
+            if (i % 4 === 0) {
+                row = table.insertRow();
+            }
+            const cell = row.insertCell();
+            cell.textContent = digits[i];
+        }
+
+        container.appendChild(table);
         screenMenu.classList.add('hidden');
         screenStudy.classList.remove('hidden');
         screenGame.classList.add('hidden');
@@ -184,7 +221,6 @@ async function initApp() {
         headerTitle.textContent = 'DIGITS';
     };
 
-    document.getElementById('btn-study-play').onclick = () => startGame();
     document.getElementById('btn-study-back').onclick = () => {
         screenStudy.classList.add('hidden');
         screenMenu.classList.remove('hidden');
