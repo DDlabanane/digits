@@ -49,6 +49,8 @@ h1 {
     position: relative;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
 .hidden {
@@ -137,6 +139,15 @@ h1 {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--text-muted);
+}
+
+.const-best {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    margin-top: 8px;
+    font-weight: bold;
 }
 
 /* Game Screen */
@@ -340,9 +351,10 @@ h1 {
     flex: 1;
     display: block;
     padding: 10px;
-    overflow-y: scroll;
+    overflow-y: auto !important;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    min-height: 0;
 }
 
 .study-table {
@@ -358,8 +370,13 @@ h1 {
 }
 
 .study-table td {
-    padding: 10px;
+    padding: 2px 0;
     width: 25%;
+}
+
+.study-table td.memorized {
+    color: var(--accent-color);
+    font-weight: bold;
 }
 
 .study-controls {
