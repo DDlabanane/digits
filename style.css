@@ -235,7 +235,6 @@ h1 {
     opacity: 1;
     transform: scale(1.2);
     color: var(--accent-color);
-    animation: digit-in 0.2s ease-out;
 }
 
 /* Conteneur qui glisse horizontalement. Sa "transition" sur transform crée
