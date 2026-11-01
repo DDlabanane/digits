@@ -1,9 +1,9 @@
 {
-  "name": "Digits Learning",
+  "name": "Digits",
   "short_name": "Digits",
-  "start_url": "/digits-learning/",
+  "start_url": "/digits/",
   "display": "standalone",
-  "background_color": "#f8f9fa",
+  "backgroun_color": "#f8f9fa",
   "theme_color": "#4a90e2",
   "icons": [
     {
