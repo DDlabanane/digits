@@ -1,3 +1,11 @@
+/* =====================================================================
+ style.css : l'apparence de l'application
+ =====================================================================
+ Un fichier CSS est une liste de règles : "sélecteur { propriété: valeur; }".
+ Le sélecteur dit QUELS éléments sont concernés :
+   - balise (body, h1)     - classe (.key)     - id (#app)
+ Les noms avec "--" sont des VARIABLES CSS : on les définit une fois ici
+ puis on les réutilise avec var(--nom). Changer une couleur ici la change partout. */
 :root {
     --bg-dark: #0a0a0a;
     --bg-panel: #1a1a1a;
@@ -10,12 +18,19 @@
     --font-mono: 'Courier New', Courier, monospace;
 }
 
+/* S'applique à TOUS les éléments :
+   - box-sizing: border-box : la largeur inclut marges internes et bordures
+   - tap-highlight transparent : pas de rectangle gris au toucher sur iPhone
+   - user-select: none : empêche de sélectionner le texte en tapotant */
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
 }
 
+/* Le corps de la page : fond sombre, texte blanc, sans défilement (overflow hidden),
+ hauteur plein écran. "display: flex" + "column" empile le header et le contenu
+ verticalement. */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--bg-dark);
@@ -28,6 +43,7 @@ body {
     flex-direction: column;
 }
 
+/* Barre de titre en haut : centrée, avec un fin trait en dessous. */
 header {
     background-color: var(--bg-dark);
     padding: 20px 15px;
@@ -35,6 +51,7 @@ header {
     border-bottom: 1px solid #222;
 }
 
+/* Le titre "DIGITS" : petit, espacé, en majuscules, couleur néon. */
 h1 {
     margin: 0;
     font-size: 1.4rem;
@@ -44,6 +61,8 @@ h1 {
     text-transform: uppercase;
 }
 
+/* Zone principale sous le titre : elle occupe tout l'espace restant (flex: 1)
+ et contient les écrans (menu, jeu...). */
 #app {
     flex: 1;
     position: relative;
@@ -53,11 +72,14 @@ h1 {
     overflow: hidden;
 }
 
+/* Classe utilitaire : cache un élément. Le JS l'ajoute/retire pour changer
+ d'écran. "!important" garantit qu'elle gagne sur les autres règles d'affichage. */
 .hidden {
     display: none !important;
 }
 
 /* Menu Screen */
+/* ÉCRAN MENU : colonne centrée, avec défilement vertical si besoin. */
 #screen-menu {
     flex: 1;
     display: flex;
@@ -67,6 +89,7 @@ h1 {
     overflow-y: auto;
 }
 
+/* Le bloc contenant les deux onglets PLAY / STUDY (fond arrondi). */
 .menu-tabs {
     display: flex;
     gap: 10px;
@@ -77,6 +100,7 @@ h1 {
     border: 1px solid #333;
 }
 
+/* Style d'un onglet inactif : transparent, texte gris. */
 .tab-btn {
     background: transparent;
     border: none;
@@ -90,11 +114,13 @@ h1 {
     letter-spacing: 1px;
 }
 
+/* Onglet actif (classe ajoutée par le JS) : fond néon, texte sombre. */
 .tab-btn.active {
     background: var(--accent-color);
     color: var(--bg-dark);
 }
 
+/* Grille des cartes de constantes : 2 colonnes égales (repeat(2, 1fr)). */
 .constants-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -104,6 +130,7 @@ h1 {
     margin-top: 20px;
 }
 
+/* Une carte de constante : fond de panneau, coins arrondis, bordure grise. */
 .const-card {
     background: var(--bg-panel);
     border: 2px solid #333;
@@ -114,12 +141,15 @@ h1 {
     transition: all 0.1s ease;
 }
 
+/* ":active" = pendant l'appui du doigt : la carte rétrécit un peu et sa bordure
+ devient néon, ce qui donne un retour visuel au toucher. */
 .const-card:active {
     transform: scale(0.95);
     border-color: var(--accent-color);
     background: var(--key-active);
 }
 
+/* Le grand symbole (π, e, φ...) sur la carte. */
 .const-symbol {
     font-size: 3rem;
     font-weight: bold;
@@ -128,6 +158,7 @@ h1 {
     margin-bottom: 10px;
 }
 
+/* Le nom de la constante. */
 .const-name {
     font-size: 1rem;
     font-weight: 600;
@@ -135,12 +166,14 @@ h1 {
     margin-bottom: 8px;
 }
 
+/* L'aperçu des premières décimales (police "machine à écrire", grise). */
 .const-preview {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--text-muted);
 }
 
+/* Le texte "BEST: xx" sur la carte (couleur néon, gras). */
 .const-best {
     display: block;
     font-family: var(--font-mono);
@@ -151,6 +184,8 @@ h1 {
 }
 
 /* Game Screen */
+/* ÉCRAN DE JEU : le haut (chiffres + stats) et le bas (clavier) sont écartés
+ aux deux extrémités grâce à justify-content: space-between. */
 #screen-game {
     flex: 1;
     display: flex;
@@ -159,12 +194,16 @@ h1 {
     padding-bottom: 30px;
 }
 
+/* Bloc du haut : la séquence de chiffres et les stats. */
 .game-display {
     text-align: center;
     margin-top: 40px;
     width: 100%;
 }
 
+/* La ligne de chiffres : grande police à largeur fixe, centrée, sans retour à la
+ ligne (nowrap). "overflow: visible" laisse déborder les chiffres hors de
+ l'écran quand la séquence glisse. */
 .digit-sequence {
     font-family: var(--font-mono);
     font-size: 3.5rem;
@@ -180,6 +219,8 @@ h1 {
     position: relative;
 }
 
+/* Un chiffre individuel : par défaut petit et estompé. "transition" anime
+ en douceur les changements de taille/opacité. */
 .digit-char {
     display: inline-block;
     flex-shrink: 0;
@@ -188,6 +229,8 @@ h1 {
     transform: scale(0.8);
 }
 
+/* Le curseur "_" (chiffre à deviner) : grand, opaque, néon, avec une petite
+ animation d'apparition (digit-in). */
 .digit-char.active {
     opacity: 1;
     transform: scale(1.2);
@@ -195,6 +238,8 @@ h1 {
     animation: digit-in 0.2s ease-out;
 }
 
+/* Conteneur qui glisse horizontalement. Sa "transition" sur transform crée
+ l'effet de défilement fluide quand le JS change le translateX. */
 .sequence-wrapper {
     display: flex;
     gap: 8px;
@@ -203,23 +248,28 @@ h1 {
     will-change: transform;
 }
 
+/* Animation d'apparition : le chiffre grossit de 0.6 à 1.2 en devenant visible. */
 @keyframes digit-in {
     from { opacity: 0; transform: scale(0.6); }
     to   { opacity: 1; transform: scale(1.2); }
 }
 
+/* Chiffre correctement tapé : blanc, taille normale. */
 .digit-char.correct {
     opacity: 1;
     transform: scale(1);
     color: var(--text-main);
 }
 
+/* Chiffre faux : rouge avec une animation de secousse (shake). */
 .digit-char.wrong {
+    transform: scale(1);
     color: var(--danger);
     animation: shake 0.2s ease-in-out;
     opacity: 1;
 }
 
+/* La ligne SCORE / TIME sous la séquence. */
 .stats {
     display: flex;
     justify-content: center;
@@ -230,12 +280,14 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* Les valeurs chiffrées des stats, en néon. */
 .stat-val {
     color: var(--accent-color);
     font-weight: bold;
 }
 
 /* Keypad - The "Game Console" feel */
+/* CLAVIER NUMÉRIQUE : grille de 3 colonnes (1-2-3 / 4-5-6 / 7-8-9 / 0). */
 .keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -246,6 +298,8 @@ h1 {
     padding: 0 10px;
 }
 
+/* Une touche : bouton rond (aspect-ratio 1/1 = carré, border-radius 50% = rond),
+ avec une ombre en bas qui donne un effet de relief "console de jeu". */
 .key {
     aspect-ratio: 1 / 1;
     border-radius: 50%;
@@ -264,26 +318,35 @@ h1 {
     overflow: hidden;
 }
 
+/* Pendant l'appui : la touche s'enfonce de 2 px et son ombre diminue. */
 .key:active {
     transform: translateY(2px);
     box-shadow: 0 2px 0 #000;
 }
 
 /* Press feedback: the whole key flashes white, then fades back to grey */
+/* Flash blanc au toucher : classe ajoutée par le JS (fonction flashKey),
+ qui joue l'animation key-flash ci-dessous. */
 .key.flash {
     animation: key-flash 0.45s ease-out;
 }
 
+/* Définition de l'animation : de blanc (début) vers gris normal (fin). */
 @keyframes key-flash {
     from { background: #ffffff; color: var(--bg-dark); }
     to   { background: var(--key-bg); color: var(--text-main); }
 }
 
+/* La 10e touche (le 0) est placée dans la colonne 2 pour être centrée
+ sous le 8. */
 .key:nth-child(10) {
     grid-column: 2;
 }
 
 /* Game Over Screen */
+/* ÉCRAN GAME OVER : positionné en "absolute" par-dessus tout (top/left 0,
+ 100% de largeur et hauteur, z-index 100) avec un fond opaque,
+ contenu centré. */
 #screen-gameover {
     position: absolute;
     top: 0;
@@ -300,6 +363,8 @@ h1 {
     text-align: center;
 }
 
+/* Le titre "CRASHED!" en rouge. (Note : le JS modifie plutôt le titre du header ;
+ ce style s'applique au <h2> de l'écran de fin.) */
 .game-over-text {
     font-size: 2.5rem;
     color: var(--danger);
@@ -307,6 +372,7 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* Bloc des statistiques finales (score, temps, meilleur). */
 .final-stats {
     font-family: var(--font-mono);
     font-size: 1.5rem;
@@ -314,11 +380,13 @@ h1 {
     line-height: 1.6;
 }
 
+/* Rangée contenant les boutons RETRY et MENU. */
 .menu-buttons {
     display: flex;
     gap: 20px;
 }
 
+/* Style des gros boutons (RETRY, MENU, BACK TO MENU) : contour néon, fond transparent. */
 .menu-btn {
     padding: 15px 30px;
     border-radius: 12px;
@@ -331,11 +399,13 @@ h1 {
     transition: all 0.2s;
 }
 
+/* Pendant l'appui : le bouton se remplit de néon. */
 .menu-btn:active {
     background: var(--accent-color);
     color: var(--bg-dark);
 }
 
+/* Animation de secousse gauche-droite utilisée pour le chiffre faux. */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
@@ -343,6 +413,8 @@ h1 {
 }
 
 /* Study Screen */
+/* ÉCRAN D'ÉTUDE : colonne qui occupe tout l'espace ; le tableau défile
+ dans .study-container, le bouton de retour reste en bas. */
 #screen-study {
     flex: 1;
     display: flex;
@@ -351,6 +423,9 @@ h1 {
     overflow: hidden;
 }
 
+/* Zone défilante contenant le tableau. "-webkit-overflow-scrolling: touch"
+ donne un défilement fluide sur iOS ; "min-height: 0" est nécessaire pour que
+ le défilement fonctionne dans un conteneur flex. */
 .study-container {
     flex: 1;
     display: block;
@@ -361,10 +436,11 @@ h1 {
     min-height: 0;
 }
 
+/* Tableau de décimales : 4 colonnes de largeur égale (table-layout: fixed). */
 .study-table {
     border-collapse: collapse;
     font-family: var(--font-mono);
-    font-size: 1.8rem;
+    font-size: 2.5rem;
     color: var(--text-main);
     text-align: center;
     width: 100%;
@@ -373,22 +449,25 @@ h1 {
     table-layout: fixed;
 }
 
+/* Une case du tableau (un chiffre) : chaque case fait 25 % de la largeur. */
 .study-table td {
     padding: 2px 0;
     width: 25%;
 }
 
+/* Chiffre "mémorisé" (selon ton meilleur score) : néon et gras. */
 .study-table td.memorized {
     color: var(--accent-color);
     font-weight: bold;
 }
 
+/* Barre du bas de l'écran d'étude contenant le bouton BACK TO MENU. */
 .study-controls {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    padding: 0px 20px;
-    background: var(--bg-panel);
-    border-top: 2px solid #333;
+    padding: 20px 20px;
+    background: transparent;
+    border-top: 1px solid #333;
 }
 

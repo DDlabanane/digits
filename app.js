@@ -1,3 +1,27 @@
+// =====================================================================
+// app.js : toute la logique de l'application (le "cerveau")
+// =====================================================================
+// Rôle du fichier :
+//   - stocker les constantes mathématiques (CONSTANTS)
+//   - construire le menu, le jeu, le mode étude et l'écran de fin
+//   - réagir aux clics (touches du clavier, boutons, onglets)
+//   - sauvegarder les meilleurs scores sur l'appareil
+//
+// Pour comprendre le fichier, pense en 3 temps :
+//   1. les DONNÉES (les décimales de chaque constante)
+//   2. les ÉCRANS (menu, étude, jeu, game over) qu'on montre/cache
+//   3. les ACTIONS (clic sur une carte, appui sur une touche...)
+//
+// ---------------------------------------------------------------------
+// LES DONNÉES : l'objet CONSTANTS
+// ---------------------------------------------------------------------
+// Un "objet" JavaScript = une boîte de paires clé: valeur.
+// Ici chaque clé (pi, e, phi, sqrt2, tau) contient elle-même un objet avec :
+//   - name   : le nom affiché dans l'interface
+//   - symbol : le symbole affiché en gros sur la carte
+//   - digits : les décimales sous forme de TEXTE (entre guillemets), y compris
+//              le "3." du début. Le texte permet d'accéder à un caractère
+//              précis avec digits[0], digits[1], etc.
 const CONSTANTS = {
     pi: {
         name: 'Pi',
@@ -26,7 +50,23 @@ const CONSTANTS = {
     }
 };
 
+// ---------------------------------------------------------------------
+// initApp() : fonction principale
+// ---------------------------------------------------------------------
+// Tout le reste du fichier est À L'INTÉRIEUR de cette fonction. Avantage :
+// les variables ci-dessous sont "privées" et partagées par toutes les
+// fonctions internes. Elle est appelée tout en bas du fichier (initApp();).
+// (Le mot "async" n'est pas utilisé ici : il ne sert à rien dans ce cas,
+// mais il ne gêne pas.)
 async function initApp() {
+    // L'ÉTAT de l'application : des variables qui changent pendant l'utilisation.
+    //   activeConstant   : la constante choisie (l'objet de CONSTANTS), ou null
+    //   currentStep      : position dans les décimales = index du prochain chiffre à deviner
+    //   score            : nombre de bons chiffres tapés pendant la partie
+    //   startTime        : heure de début de partie (en millisecondes)
+    //   timerInterval    : identifiant du minuteur, pour pouvoir l'arrêter
+    //   currentMenuMode  : onglet actif du menu, 'play' (jouer) ou 'study' (étudier)
+    //   activeKey        : clé de la constante choisie ('pi', 'e'...), sert pour les scores
     let activeConstant = null;
     let currentStep = 0;
     let score = 0;
@@ -36,8 +76,16 @@ async function initApp() {
     let activeKey = null;
 
     // --- Meilleurs scores (stockage local) ---
+    // Les meilleurs scores sont stockés dans le "localStorage" du navigateur :
+    // une petite mémoire qui survit à la fermeture de l'app, propre à l'appareil.
+    // On y range un seul texte JSON, par exemple : {"pi": 25, "e": 10}
+    // STORAGE_KEY est le nom de cette "case" de mémoire.
     const STORAGE_KEY = 'digits-best-scores';
 
+    // Lit les meilleurs scores. JSON.parse transforme le texte stocké en objet.
+    // Le "|| {}" donne un objet vide si rien n'est encore sauvegardé.
+    // try/catch : si le stockage est inaccessible (mode privé...), on renvoie {}
+    // plutôt que de faire planter l'application.
     function loadBest() {
         try {
             return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
@@ -46,6 +94,9 @@ async function initApp() {
         }
     }
 
+    // Enregistre un score pour une constante (ex : saveBest('pi', 30)).
+    // On lit tout, on modifie une entrée, puis on réécrit tout (JSON.stringify
+    // transforme l'objet en texte pour pouvoir le stocker).
     function saveBest(key, value) {
         try {
             const best = loadBest();
@@ -54,6 +105,9 @@ async function initApp() {
         } catch (e) { /* stockage indisponible : on ignore */ }
     }
 
+    // Met à jour le texte "BEST: xx" sur chaque carte du menu.
+    // querySelectorAll('.const-best') récupère tous les éléments ayant cette classe ;
+    // el.dataset.key lit l'attribut data-key="..." posé lors de la création des cartes.
     function updateBestDisplays() {
         const best = loadBest();
         document.querySelectorAll('.const-best').forEach(el => {
@@ -62,21 +116,33 @@ async function initApp() {
         });
     }
 
+    // Raccourcis vers les éléments HTML. document.getElementById('x') cherche
+    // l'élément qui a id="x" dans index.html. On le fait une seule fois ici,
+    // puis on réutilise les variables.
     const screenMenu = document.getElementById('screen-menu');
     const screenStudy = document.getElementById('screen-study');
     const screenGame = document.getElementById('screen-game');
     const screenGameOver = document.getElementById('screen-gameover');
     const headerTitle = document.getElementById('header-title');
 
+    // Éléments de l'écran de jeu : la ligne de chiffres, le score et le chrono.
     const digitSequenceEl = document.getElementById('digit-sequence');
     const scoreEl = document.getElementById('score');
     const timerEl = document.getElementById('timer');
 
+    // Éléments de l'écran de fin de partie.
     const finalScoreEl = document.getElementById('final-score');
     const finalTimeEl = document.getElementById('final-time');
 
+    // La grille du menu dans laquelle on va insérer une carte par constante.
     const constantsGrid = document.querySelector('.constants-grid');
 
+    // CRÉATION DES CARTES DU MENU
+    // Object.entries(CONSTANTS) transforme l'objet en liste de paires [clé, données].
+    // forEach répète le bloc pour chaque constante : on crée une <div> (une carte),
+    // on remplit son HTML avec le symbole, le nom, un aperçu des 12 premiers
+    // caractères (substring(0, 12)) et un espace vide pour le meilleur score.
+    // Les ${...} dans les backticks insèrent la valeur d'une variable dans le texte.
     Object.entries(CONSTANTS).forEach(([key, data]) => {
         const card = document.createElement('div');
         card.className = 'const-card';
@@ -86,6 +152,8 @@ async function initApp() {
             <span class="const-preview">${data.digits.substring(0, 12)}...</span>
             <span class="const-best" data-key="${key}"></span>
         `;
+        // Au clic sur une carte : on retient quelle constante est choisie, puis on
+        // lance le mode étude ou le jeu selon l'onglet actif.
         card.onclick = () => {
             activeConstant = data;
             activeKey = key;
@@ -98,12 +166,16 @@ async function initApp() {
         constantsGrid.appendChild(card);
     });
 
+    // Une fois les cartes créées, on affiche les meilleurs scores déjà sauvegardés.
     updateBestDisplays();
 
     // Tab switching logic
     const tabPlay = document.getElementById('tab-play');
     const tabStudy = document.getElementById('tab-study');
 
+    // ONGLETS PLAY / STUDY
+    // Un clic change le mode (currentMenuMode) et déplace la classe CSS "active"
+    // (l'onglet en surbrillance) d'un bouton à l'autre.
     tabPlay.onclick = () => {
         currentMenuMode = 'play';
         tabPlay.classList.add('active');
@@ -116,6 +188,12 @@ async function initApp() {
         tabPlay.classList.remove('active');
     };
 
+    // MODE ÉTUDE : affiche toutes les décimales dans un tableau de 4 colonnes.
+    // Les chiffres déjà "mémorisés" (selon ton meilleur score) sont colorés.
+    //   - on vide le conteneur (innerHTML = '')
+    //   - on crée un <table> ; toutes les 4 cases (i % 4 === 0) on ajoute une ligne
+    //   - memorizedCount = meilleur score + 2, car le "3" et le "." sont offerts
+    //   - puis on affiche l'écran d'étude et on cache les autres (classe "hidden")
     function startStudy() {
         const container = document.getElementById('study-digits-container');
         container.innerHTML = '';
@@ -146,6 +224,12 @@ async function initApp() {
         headerTitle.textContent = `${activeConstant.name} STUDY`;
     }
 
+    // LANCE UNE PARTIE
+    //   - currentStep = 2 : on saute "3" et "." (index 0 et 1), le joueur
+    //     commence aux premières vraies décimales
+    //   - on remet score et chrono à zéro
+    //   - sequenceWrapper = null : force la reconstruction de la ligne de chiffres
+    //   - on affiche l'écran de jeu, on dessine la séquence, on démarre le chrono
     function startGame() {
         currentStep = 2;
         score = 0;
@@ -164,8 +248,12 @@ async function initApp() {
         startTimer();
     }
 
+    // sequenceWrapper : la <div> qui contient tous les chiffres affichés.
+    // On la fait glisser vers la gauche pour garder le chiffre actif centré.
     let sequenceWrapper = null;
 
+    // Crée un chiffre à afficher : un <span> avec un texte et des classes CSS
+    // ('digit-char' + un état : 'correct', 'active' ou 'wrong').
     function createDigitSpan(text, state) {
         const span = document.createElement('span');
         span.className = `digit-char ${state}`;
@@ -175,6 +263,10 @@ async function initApp() {
 
     // Slide the wrapper so the active digit sits in the middle of the screen.
     // Uses layout positions (offsetLeft) so it stays correct mid-animation.
+    // CENTRAGE : calcule de combien décaler la séquence (translateX) pour que
+    // le dernier élément (le curseur "_") soit au milieu de l'écran.
+    //   animate = true  : le décalage est animé (transition définie dans le CSS)
+    //   animate = false : le décalage est immédiat
     function centerSequence(animate) {
         if (!sequenceWrapper || digitSequenceEl.clientWidth === 0) return;
         const last = sequenceWrapper.lastElementChild;
@@ -183,6 +275,9 @@ async function initApp() {
         const digitCenter = sequenceWrapper.offsetLeft + last.offsetLeft + last.offsetWidth / 2;
         const offset = digitSequenceEl.clientWidth / 2 - digitCenter;
 
+        // Astuce pour un saut instantané : on coupe la transition, on applique la
+        // position, puis on force le navigateur à recalculer la mise en page
+        // (la ligne "void ...offsetWidth") avant de réactiver la transition.
         if (animate) {
             sequenceWrapper.style.transform = `translateX(${offset}px)`;
         } else {
@@ -194,6 +289,11 @@ async function initApp() {
         }
     }
 
+    // AFFICHE / MET À JOUR LA LIGNE DE CHIFFRES
+    //   - 1er appel d'une partie : on construit tout (les chiffres déjà
+    //     donnés + un curseur "_")
+    //   - appels suivants : on transforme le curseur en chiffre correct, on
+    //     ajoute un nouveau curseur, et on fait glisser la séquence
     function renderSequence() {
         if (!sequenceWrapper) {
             // New game: build the sequence from scratch
@@ -217,8 +317,12 @@ async function initApp() {
         centerSequence(true);
     }
 
+    // Si la fenêtre change de taille (rotation de l'iPhone...), on recentre.
     window.addEventListener('resize', () => centerSequence(false));
 
+    // CHRONO : setInterval exécute le code toutes les 1000 ms. On calcule le
+    // temps écoulé depuis startTime, puis on l'affiche au format m:ss
+    // (padStart(2, '0') ajoute un zéro devant : 5 devient "05").
     function startTimer() {
         startTime = Date.now();
         if (timerInterval) clearInterval(timerInterval);
@@ -230,6 +334,12 @@ async function initApp() {
         }, 1000);
     }
 
+    // CŒUR DU JEU : appelé à chaque appui sur une touche (digit = "7" par ex.).
+    // On compare avec le chiffre attendu dans les décimales (digits[currentStep]).
+    //   - bon chiffre : score +1, on avance d'une position, on redessine
+    //   - mauvais chiffre : on affiche le chiffre faux en rouge et on termine la partie
+    // Remarque : digit et targetDigit sont tous deux du TEXTE, d'où la comparaison
+    // possible avec ===.
     function handleInput(digit) {
         const targetDigit = activeConstant.digits[currentStep];
 
@@ -251,6 +361,14 @@ async function initApp() {
         }
     }
 
+    // FIN DE PARTIE
+    //   - arrête le chrono
+    //   - remplit l'écran de fin (score, temps)
+    //   - compare avec l'ancien record et le sauvegarde si battu
+    //   - affiche "..." + les 4 derniers bons chiffres + le chiffre manqué en rouge
+    //   - change le titre : PERFECT! / NEW RECORD! / CRASHED!
+    // Le paramètre "won" vaut toujours false pour l'instant (aucune condition de
+    // victoire n'existe, les décimales étant très longues).
     function endGame(won) {
         clearInterval(timerInterval);
         const finalTime = timerEl.textContent;
@@ -279,18 +397,29 @@ async function initApp() {
         headerTitle.textContent = won ? 'PERFECT!' : (isRecord ? 'NEW RECORD!' : 'CRASHED!');
     }
 
+    // Effet visuel : fait clignoter une touche en blanc. On retire puis on remet
+    // la classe "flash" (avec un reflow entre les deux) pour relancer l'animation
+    // même si on retape très vite.
     function flashKey(btn) {
         btn.classList.remove('flash');
         void btn.offsetWidth; // restart the animation if tapped again quickly
         btn.classList.add('flash');
     }
 
+    // BRANCHEMENT DES TOUCHES DU CLAVIER
+    // Pour chaque bouton .key :
+    //   - pointerdown (dès que le doigt touche) : effet de flash
+    //   - onclick : envoie le chiffre (lu dans data-val="...") à handleInput
     document.querySelectorAll('.key').forEach(btn => {
         btn.addEventListener('pointerdown', () => flashKey(btn));
         btn.onclick = () => handleInput(btn.dataset.val);
     });
 
+    // BOUTONS DE L'ÉCRAN DE FIN
+    // RETRY relance une partie avec la même constante.
     document.getElementById('btn-retry').onclick = () => startGame();
+    // MENU : on cache tous les écrans sauf le menu, on remet le titre et on
+    // rafraîchit les meilleurs scores affichés.
     document.getElementById('btn-menu').onclick = () => {
         screenGameOver.classList.add('hidden');
         screenGame.classList.add('hidden');
@@ -300,6 +429,7 @@ async function initApp() {
         updateBestDisplays();
     };
 
+    // Bouton de l'écran d'étude : retour au menu.
     document.getElementById('btn-study-back').onclick = () => {
         screenStudy.classList.add('hidden');
         screenMenu.classList.remove('hidden');
@@ -307,4 +437,5 @@ async function initApp() {
     };
 }
 
+// Démarrage : on lance la fonction principale une fois le fichier chargé.
 initApp();

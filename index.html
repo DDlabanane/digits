@@ -1,88 +1,115 @@
+<!-- =====================================================================
+index.html : la STRUCTURE de l'application (le "squelette")
+=====================================================================
+HTML décrit quels éléments existent (titres, boutons, zones).
+Le CSS les habille (style.css) et le JS les anime (app.js).
+Important : les "id" et "class" ci-dessous sont les points d'accroche utilisés par le CSS et le JS.
+Si tu en renommes un ici, il faut le renommer aussi dans les autres fichiers.
+Les écrans sont tous présents dès le départ ; le JS affiche l'un et cache les autres avec la classe "hidden". -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Digits Learning</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Digits">
-</head>
-<body>
-    <header id="app-header">
-        <h1 id="header-title">DIGITS</h1>
-    </header>
-
-    <main id="app">
-        <!-- Menu Screen -->
-        <section id="screen-menu" class="screen">
-            <div class="menu-tabs">
-                <button id="tab-play" class="tab-btn active">PLAY</button>
-                <button id="tab-study" class="tab-btn">STUDY</button>
-            </div>
-            <div class="constants-grid">
-                <!-- Cards will be injected here -->
-            </div>
-        </section>
-
-        <!-- Study Screen -->
-        <section id="screen-study" class="screen hidden">
-            <div class="study-container">
-                <div id="study-digits-container"></div>
-            </div>
-            <div class="study-controls">
-                <button id="btn-study-back" class="menu-btn">BACK TO MENU</button>
-            </div>
-        </section>
-
-        <!-- Game Screen -->
-        <section id="screen-game" class="screen hidden">
-            <div class="game-display">
-                <div id="digit-sequence" class="digit-sequence"></div>
-                <div class="stats">
-                    <span>SCORE: <span id="score" class="stat-val">0</span></span>
-                    <span>TIME: <span id="timer" class="stat-val">0:00</span></span>
+    <head>
+        <meta charset="UTF-8">
+        <!-- Adapte la page à l'écran du téléphone. maximum-scale=1 et user-scalable=no désactivent le zoom par pincement, pour une sensation d'application. -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Digits Learning</title>
+        <!-- Lie le fichier manifest.json : il décrit l'app (nom, icônes, couleurs) pour
+        pouvoir l'installer sur l'écran d'accueil. -->
+        <link rel="manifest" href="manifest.json">
+        <!-- Charge le fichier de style style.css. -->
+        <link rel="stylesheet" href="style.css">
+        <!-- Réglages spécifiques iPhone : mode plein écran sans barre Safari quand l'app est ajoutée à l'écran d'accueil, barre d'état translucide, et nom court de l'icône. -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="Digits">
+    </head>
+    <body>
+        <!-- EN-TÊTE : le titre. Le JS change le texte de #header-title selon l'écran
+        (DIGITS, nom de la constante, NEW RECORD!...). -->
+        <header id="app-header">
+            <h1 id="header-title">DIGITS</h1>
+        </header>
+        <!-- CONTENU PRINCIPAL : contient les 4 écrans (<section>). -->
+        <main id="app">
+            <!-- Menu Screen -->
+            <!-- ÉCRAN 1 : MENU. Deux onglets (PLAY / STUDY) puis la grille de constantes. -->
+            <section id="screen-menu" class="screen">
+                <div class="menu-tabs">
+                    <button id="tab-play" class="tab-btn active">PLAY</button>
+                    <button id="tab-study" class="tab-btn">STUDY</button>
                 </div>
-            </div>
-            <div class="keypad">
-                <button class="key" data-val="1">1</button>
-                <button class="key" data-val="2">2</button>
-                <button class="key" data-val="3">3</button>
-                <button class="key" data-val="4">4</button>
-                <button class="key" data-val="5">5</button>
-                <button class="key" data-val="6">6</button>
-                <button class="key" data-val="7">7</button>
-                <button class="key" data-val="8">8</button>
-                <button class="key" data-val="9">9</button>
-                <button class="key" data-val="0">0</button>
-            </div>
-        </section>
-
-        <!-- Game Over Screen -->
-        <section id="screen-gameover" class="screen hidden">
-            <h2 class="game-over-text">CRASHED!</h2>
-            <div id="gameover-digits" class="digit-sequence"></div>
-            <div class="final-stats">
-                <p>FINAL SCORE: <span id="final-score">0</span></p>
-                <p>TIME: <span id="final-time">0:00</span></p>
-                <p>BEST: <span id="final-best">0</span></p>
-            </div>
-            <div class="menu-buttons">
-                <button id="btn-retry" class="menu-btn">RETRY</button>
-                <button id="btn-menu" class="menu-btn">MENU</button>
-            </div>
-        </section>
-    </main>
-
-    <script src="app.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
+                <!-- Cette grille est vide dans le HTML : app.js crée une carte par constante. -->
+                <div class="constants-grid">
+                    <!-- Cards will be injected here -->
+                </div>
+            </section>
+            <!-- Study Screen -->
+            <!-- ÉCRAN 2 : ÉTUDE. #study-digits-container reçoit le tableau de décimales
+            (généré par app.js) ; le bouton ramène au menu. Caché au départ (class="hidden"). -->
+            <section id="screen-study" class="screen hidden">
+                <div class="study-container">
+                    <div id="study-digits-container"></div>
+                </div>
+                <div class="study-controls">
+                    <button id="btn-study-back" class="menu-btn">BACK TO MENU</button>
+                </div>
+            </section>
+            <!-- Game Screen -->
+            <!-- ÉCRAN 3 : JEU. En haut : la séquence de chiffres, le score et le chrono.
+            En bas : le clavier numérique. -->
+            <section id="screen-game" class="screen hidden">
+                <div class="game-display">
+                    <div id="digit-sequence" class="digit-sequence"></div>
+                    <div class="stats">
+                        <span>SCORE: <span id="score" class="stat-val">0</span></span>
+                        <span>TIME: <span id="timer" class="stat-val">0:00</span></span>
+                    </div>
+                </div>
+                <!-- Les 10 touches. L'attribut data-val="..." contient le chiffre : app.js le lit
+                pour savoir quelle touche a été pressée. -->
+                <div class="keypad">
+                    <button class="key" data-val="1">1</button>
+                    <button class="key" data-val="2">2</button>
+                    <button class="key" data-val="3">3</button>
+                    <button class="key" data-val="4">4</button>
+                    <button class="key" data-val="5">5</button>
+                    <button class="key" data-val="6">6</button>
+                    <button class="key" data-val="7">7</button>
+                    <button class="key" data-val="8">8</button>
+                    <button class="key" data-val="9">9</button>
+                    <button class="key" data-val="0">0</button>
+                </div>
+            </section>
+            <!-- Game Over Screen -->
+            <!-- ÉCRAN 4 : FIN DE PARTIE. Les valeurs (score, temps, best) sont remplies
+            par app.js. Deux boutons : RETRY et MENU. -->
+            <section id="screen-gameover" class="screen hidden">
+                <h2 class="game-over-text">CRASHED!</h2>
+                <div id="gameover-digits" class="digit-sequence"></div>
+                <div class="final-stats">
+                    <p>FINAL SCORE: <span id="final-score">0</span>
+                    <br>
+                    TIME: <span id="final-time">0:00</span>
+                    </br>
+                    BEST: <span id="final-best">0</span></p>
+                </div>
+                <div class="menu-buttons">
+                    <button id="btn-retry" class="menu-btn">RETRY</button>
+                    <button id="btn-menu" class="menu-btn">MENU</button>
+                </div>
+            </section>
+        </main>
+        <!-- Charge la logique JavaScript. Placé en fin de <body> pour que tous les
+            éléments existent déjà quand le script s'exécute. -->
+            <script src="app.js"></script>
+            <!-- Petit script intégré : enregistre le service worker (sw.js) une fois la page
+            chargée. C'est lui qui permet à l'app de fonctionner hors ligne. -->
+            <script>
+            if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
+            navigator.serviceWorker.register('sw.js');
             });
-        }
-    </script>
-</body>
-</html>
+            }
+            </script>
+        </body>
+    </html>
