@@ -3,7 +3,7 @@
   "short_name": "Digits",
   "start_url": "/digits/",
   "display": "standalone",
-  "backgroun_color": "#f8f9fa",
+  "background_color": "#f8f9fa",
   "theme_color": "#4a90e2",
   "icons": [
     {
