@@ -495,6 +495,7 @@ async function initApp() {
         screenGameOver.classList.add('hidden');
         screenGame.classList.add('hidden');
         screenStudy.classList.add('hidden');
+        screenWiki.classList.add('hidden');
         screenMenu.classList.remove('hidden');
         headerTitle.textContent = 'DIGITS';
         updateBestDisplays();
