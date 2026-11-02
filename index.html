@@ -37,12 +37,14 @@ Les écrans sont tous présents dès le départ ; le JS affiche l'un et cache le
                 <div class="menu-tabs">
                     <button id="tab-play" class="tab-btn active">PLAY</button>
                     <button id="tab-study" class="tab-btn">STUDY</button>
+                    <button id="tab-wiki" class="tab-btn">WIKI</button>
                 </div>
                 <!-- Cette grille est vide dans le HTML : app.js crée une carte par constante. -->
                 <div class="constants-grid">
                     <!-- Cards will be injected here -->
                 </div>
             </section>
+            
             <!-- Study Screen -->
             <!-- ÉCRAN 2 : ÉTUDE. #study-digits-container reçoit le tableau de décimales
             (généré par app.js) ; le bouton ramène au menu. Caché au départ (class="hidden"). -->
@@ -54,6 +56,19 @@ Les écrans sont tous présents dès le départ ; le JS affiche l'un et cache le
                     <button id="btn-study-back" class="menu-btn">BACK TO MENU</button>
                 </div>
             </section>
+
+
+            <!-- Wiki Screen -->
+            <!-- ÉCRAN 2.5 : INFOS. #wiki-container reçoit les infos générées par app.js (si j'ai bien fai les choses) -->
+            <section id="screen-wiki" class="screen hidden">
+                <div class="wiki-container"> 
+                    <div id="wiki-info-container"></div>
+                </div>
+                <div class="wiki-controls">
+                    <button id="btn-wiki-back" class="menu-btn">BACK TO MENU</button>
+                </div>
+            </section>
+
             <!-- Game Screen -->
             <!-- ÉCRAN 3 : JEU. En haut : la séquence de chiffres, le score et le chrono.
             En bas : le clavier numérique. -->
