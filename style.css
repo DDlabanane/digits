@@ -422,6 +422,14 @@ h1 {
     overflow: hidden;
 }
 
+#screen-wiki {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
 /* Zone défilante contenant le tableau. "-webkit-overflow-scrolling: touch"
  donne un défilement fluide sur iOS ; "min-height: 0" est nécessaire pour que
  le défilement fonctionne dans un conteneur flex. */
@@ -433,28 +441,6 @@ h1 {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     min-height: 0;
-}
-
-.wiki-container {
-    flex: 1;
-    display: block;
-    padding: 10px;
-    overflow-y: auto !important;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    min-height: 0;
-}
-
-.wiki-info-container {
-    border-collapse: collapse;
-    font-family: var(--font-mono);
-    font-size: 2.5rem;
-    color: var(--text-main);
-    text-align: center;
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
-    table-layout: fixed;
 }
 
 /* Tableau de décimales : 4 colonnes de largeur égale (table-layout: fixed). */
@@ -492,6 +478,20 @@ h1 {
     border-top: 1px solid #333;
 }
 
+/* Wiki Screen */
+
+
+.wiki-container {
+    font-size: 1.4rem;
+    flex: 1;
+    display: block;
+    padding: 10px;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;   
+}
+
 .wiki-controls {
     display: flex;
     flex-direction: column;
@@ -500,4 +500,3 @@ h1 {
     background: transparent;
     border-top: 1px solid #333;
 }
-
